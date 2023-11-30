@@ -37,26 +37,25 @@ limit 10
  * чья средняя выручка ниже общей средней выручки*/
 
 with tab as (
+	select
+	s.sales_person_id,
+	round(avg(p.price * s.quantity)) as average
+	from sales s
+	join products p 
+		on s.product_id = p.product_id
+	group by s.sales_person_id
+)
 select
 	concat(e.first_name, ' ', e.last_name) as name,
-	FLOOR(AVG(s.quantity * p.price)) as average_income
-from employees e
-left join sales s
-	on e.employee_id = s.sales_person_id
-left join products p
-	on s.product_id = p.product_id
-group by concat(e.first_name, ' ', e.last_name)
-)
-select *
-from tab
-where tab.average_income < (
-							select
-								FLOOR(AVG(s.quantity * p.price))
-							from sales s
-							left join products p
-								on s.product_id = p.product_id
-)
-order by average_income asc
+	tab.average as average_income
+from employees e 
+join tab
+	on e.employee_id = tab.sales_person_id
+group by
+	name,
+	average_income
+having tab.average < (select sum(average) / count(*) from tab)
+order by average_income
 ;
 
 /* Выводим данные по выручке по каждому продавцу и дню недели,
