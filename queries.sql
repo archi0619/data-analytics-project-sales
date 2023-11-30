@@ -111,21 +111,13 @@ order by age_category
 /* Выводим данные по количеству уникальных покупателей и выручке, которую они принесли.
  * Данные сгруппированы по дате, которая представлена в числовом виде ГОД-МЕСЯЦ. */
 
-with income_per_date as (
 select
 	to_char(s.sale_date, 'YYYY-MM') as date,
-	count(distinct(s.customer_id)) as unique_customers,
-	round(SUM(s.quantity * p.price)) as total_sum
+	count(distinct(customer_id)) as total_customers,
+	floor(sum(s.quantity * p.price)) as income
 from sales s
-left join products p
+join products p 
 	on s.product_id = p.product_id
-group by s.sale_date
-)
-select
-	date,
-	sum(unique_customers) as total_customers,
-	sum(total_sum) as income
-from income_per_date
 group by date
 order by date
 ;
