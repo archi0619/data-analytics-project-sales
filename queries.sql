@@ -4,19 +4,6 @@ select COUNT(c.customer_id) as customers_count
 from customers c
 ;
 
-/* Выводим ТОП 10 товаров по сумме продаж в пордке убывания суммы: */
-
-SELECT
-	s.ProductID,
-	FLOOR(SUM(s.Quantity * p.Price)) AS Amount
-FROM sales s
-LEFT JOIN products p
-	ON s.ProductID = p.ProductId
-GROUP BY s.ProductID
-ORDER BY Amount DESC
-LIMIT 10
-;
-
 /* Выводим ТОП 10 продавцов по выручке в порядке убывания*/
 
 select
@@ -66,11 +53,11 @@ select
 	to_char(s.sale_date, 'day') as weekday,
 	EXTRACT(ISODOW from s.sale_date),
 	concat(e.first_name, ' ', e.last_name) as name,
-	FLOOR(SUM(s.quantity * p.price)) as income
+	ROUND(SUM(s.quantity * p.price)) as income
 from employees e
-left join sales s
+join sales s
 	on e.employee_id = s.sales_person_id
-left join products p
+join products p
 	on s.product_id = p.product_id
 group by
 	concat(e.first_name, ' ', e.last_name),
