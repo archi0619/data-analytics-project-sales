@@ -26,7 +26,7 @@ limit 10
 with tab as (
 	select
 		s.sales_person_id,
-		round(avg(p.price * s.quantity)) as average
+		avg(p.price * s.quantity) as avge
 		from sales s
 	join products p 
 		on s.product_id = p.product_id
@@ -34,14 +34,15 @@ with tab as (
 )
 select
 	concat(e.first_name, ' ', e.last_name) as seller,
-	tab.average as average_income
+	round(tab.avge) as average_income
 from employees as e 
 join tab
 	on e.employee_id = tab.sales_person_id
 group by
 	seller,
-	average_income
-having tab.average < (select sum(average) / count(*) from tab)
+	average_income,
+	tab.avge
+having tab.avge < (select sum(avge) / count(*) from tab)
 order by average_income
 ;
 
